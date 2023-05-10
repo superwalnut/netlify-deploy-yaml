@@ -17,6 +17,6 @@ jobs:
         run: npm install -g netlify-cli
 
       - name: Netlify Deploy
-        run: netlify deploy --site ${{ secrets.SITE_NAME }} --dir "public" --prod
+        run: netlify deploy --site ${{ vars.SITE_NAME }} --dir "public" --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
