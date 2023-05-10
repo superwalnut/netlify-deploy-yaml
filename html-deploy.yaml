@@ -13,9 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
       - name: Netlify Deploy
-        uses: netlify/actions/cli@master
-        with:
-          args: netlify deploy --site ${{ secrets.SITE_NAME }} --dir "public" --prod
+        run: netlify deploy --site ${{ secrets.SITE_NAME }} --dir "public" --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
