@@ -1,0 +1,21 @@
+name: Netlify Deploy
+
+on:
+  push:
+    branches:
+      - main  # Change this to your desired branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Netlify Deploy
+        uses: netlify/actions/cli@master
+        with:
+          args: netlify deploy --site ${{ secrets.SITE_NAME }} --dir "public" --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
