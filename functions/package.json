@@ -1,0 +1,11 @@
+{
+    "name": "contact-us-email-function",
+    "version": "1.0.0",
+    "description": "contact us mailer",
+    "author": "preciseagency.com.au",
+    "license": "ISC",
+    "dependencies": {
+      "dotenv": "^8.2.0",
+      "mailgun-js": "^0.22.0"
+    }
+}
