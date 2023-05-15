@@ -5,43 +5,81 @@ const mailgun = require('mailgun-js')({
     apiKey: MAILGUN_API_KEY, 
     domain: MAILGUN_DOMAIN, 
     url: MAILGUN_URL });
+const origin = `https://${REFERRER}`;
 
-exports.handler = async (event) => {
-  if (!event.headers.referrer.includes(REFERRER)) {
-    // process the function
-     return {
-       statusCode: 401,
-       body: JSON.stringify('Unauthorized')
-     }
-  }
+exports.handler = async function (event, context) {
+  const headers = {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': true,
+    'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Security, Referral'
+  };
 
-  if (!event.headers?.security === MAILER_API_KEY) {
+  if (event.httpMethod == 'OPTIONS') {
+    // To enable CORS
     return {
-      statusCode: 401,
-      body: JSON.stringify('Unauthorized')
+      statusCode: 200, // <-- Important!
+      headers,
+      body: 'This was a preflight request!'
+    };
+  }
+  
+    if (event.headers?.Security !== MAILER_API_KEY) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({
+          error: "Not Allowed"
+        })
+      };
     }
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed', headers: { 'Allow': 'POST' } }
-  }
-
-  const data = JSON.parse(event.body)
-  if (!data.message || !data.contactName || !data.contactEmail) {
-    return { statusCode: 422, body: 'Name, email, and message are required.' }
-  }
-
-  const mailgunData = {
-    from: FROM_EMAIL,
-    to: data.contactEmail,
-    subject: `You have a new inquiry from ${data.contactName}`,
-    html: data.message
-  }
-  return mailgun.messages().send(mailgunData).then(() => ({
-    statusCode: 200,
-    body: "Your message was sent successfully! We'll be in touch."
-  })).catch(error => ({
-    statusCode: 422,
-    body: `Error: ${error}`
-  }))
+  
+    console.log('security is ok');
+  
+    if (event.httpMethod !== 'POST') {
+      return { 
+        statusCode: 405, 
+        headers, 
+        body: JSON.stringify({
+          error: "Not Allowed"
+        })
+      };
+    }
+  
+    console.log('post is ok');
+  
+    const data = JSON.parse(event.body)
+    if (!data.message || !data.contactName || !data.contactEmail) {
+      return { 
+        statusCode: 422, 
+        headers, 
+        body: JSON.stringify({
+          error: "Not Valid"
+        })
+      };
+    }
+  
+    console.log('data is ok');
+  
+    const mailgunData = {
+      from: FROM_EMAIL,
+      to: data.contactEmail,
+      subject: `You have a new inquiry from ${data.contactName}`,
+      html: data.message
+    }
+  
+    console.log('sending to mailgun');
+  
+    return mailgun.messages().send(mailgunData).then(() => ({
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true
+      })
+    })).catch(error => ({
+      statusCode: 422,
+      headers,
+      body: JSON.stringify({
+        error:  `Error: ${error}`
+      })
+    }))
 }
