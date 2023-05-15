@@ -14,16 +14,16 @@ exports.handler = async function (event, context) {
     'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Security, Referral'
   };
 
-  if (event.httpMethod == 'OPTIONS') {
-    // To enable CORS
-    return {
-      statusCode: 200, // <-- Important!
-      headers,
-      body: 'This was a preflight request!'
-    };
-  }
-  
-    if (event.headers?.Security !== MAILER_API_KEY) {
+    if (event.httpMethod == 'OPTIONS') {
+      // To enable CORS
+      return {
+        statusCode: 200, // <-- Important!
+        headers,
+        body: 'This was a preflight request!'
+      };
+    }
+
+    if (event.headers?.security != MAILER_API_KEY) {
       return {
         statusCode: 401,
         headers,
